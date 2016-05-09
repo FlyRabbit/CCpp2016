@@ -1,0 +1,5 @@
+﻿  stdafx.cpp
+  sfml-app.cpp
+sfml-app.obj : error LNK2001: 无法解析的外部符号 "public: static class sf::RenderStates const sf::RenderStates::Default" (?Default@RenderStates@sf@@2V12@B)
+sfml-app.obj : error LNK2001: 无法解析的外部符号 "public: static class sf::Color const sf::Color::Green" (?Green@Color@sf@@2V12@B)
+C:\Users\ETenal\Documents\Visual Studio 2015\Projects\sfml-app\x64\Debug\sfml-app.exe : fatal error LNK1120: 2 个无法解析的外部命令
