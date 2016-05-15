@@ -22,7 +22,7 @@ public:
 	int damage, range, ammo;
 	int flag, type;
 	int father;
-	bool isFriend;
+	bool isFriend, underAttack;
 
 };
 

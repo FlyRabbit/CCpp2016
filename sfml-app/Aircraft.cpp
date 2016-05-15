@@ -15,8 +15,6 @@ eTexture()
 		Score = EnemyScore;
 		damage = EnemyDamage;
 		range = EnemyRange;
-		width = EnemyWidth;
-		height = EnemyHeight;
 		father = Enemy;
 		eTexture.loadFromFile("resources/image/enemy.png");
 		eSprite.setTexture(eTexture);
@@ -30,6 +28,7 @@ eTexture()
 		damage = PlayerDamage;
 		range = PlayerRange;
 		father = Player;
+		underAttack = Safe;
 		eTexture.loadFromFile("resources/image/player.png");
 		eSprite.setTexture(eTexture);
 		break;
@@ -41,8 +40,6 @@ eTexture()
 		Score = BulletScore;
 		damage = BulletDamage;
 		range = BulletRange;
-		width = BulletWidth;
-		height = BulletHight;
 		father = Player;
 		ammo = MAXNUM;
 		eTexture.loadFromFile("resources/image/bullet.png");
@@ -56,8 +53,6 @@ eTexture()
 		Score = JbBulletScore;
 		damage = JbBulletDamage;
 		range = JbBulletRange;
-		width = JbBulletWidth;
-		height = JbBulletHight;
 		father = Player;
 		ammo = InitialJbBullet;
 		eTexture.loadFromFile("resources/image/jbbullet.png");
@@ -70,10 +65,69 @@ eTexture()
 		Score = BossScore;
 		damage = BossDamage;
 		range = BossRange;
-		width = BossWidth;
-		height = BossHeight;
 		father = Boss;
 		eTexture.loadFromFile("resources/image/boss.png");
+		eSprite.setTexture(eTexture);
+		break;
+	case Bomb:
+		type = flag;
+		eVelocity = BombSpeed;
+		HealthPoint = BombHP;
+		Armor = BombArmor;
+		Score = BombScore;
+		damage = BombDamage;
+		range = BombRange;
+		father = Player;
+		ammo = InitialBomb;
+		eTexture.loadFromFile("resources/image/bombtarget.png");
+		eSprite.setTexture(eTexture);
+		break;
+	case ExplodeWave:
+		type = flag;
+		eVelocity = ExplodeWaveSpeed;
+		HealthPoint = ExplodeWaveHP;
+		Armor = ExplodeWaveArmor;
+		Score = ExplodeWaveScore;
+		damage = ExplodeWaveDamage;
+		range = ExplodeWaveRange;
+		father = Player;
+		eTexture.loadFromFile("resources/image/explosivewave.png");
+		eSprite.setTexture(eTexture);
+		break;
+	case ParachuteBomb:
+		type = flag;
+		eVelocity = ParachuteBombSpeed;
+		HealthPoint = ParachuteBombHP;
+		Armor = ParachuteBombArmor;
+		Score = ParachuteBombScore;
+		damage = ParachuteBombDamage;
+		range = ParachuteBombRange;
+		father = Enemy;
+		eTexture.loadFromFile("resources/image/parachutebomb.png");
+		eSprite.setTexture(eTexture);
+		break;
+	case ParachuteBullet:
+		type = flag;
+		eVelocity = ParachuteBulletSpeed;
+		HealthPoint = ParachuteBulletHP;
+		Armor = ParachuteBulletArmor;
+		Score = ParachuteBulletScore;
+		damage = ParachuteBulletDamage;
+		range = ParachuteBulletRange;
+		father = Enemy;
+		eTexture.loadFromFile("resources/image/parachutejbbullet.png");
+		eSprite.setTexture(eTexture);
+		break;
+	case Laser:
+		type = flag;
+		eVelocity = LaserSpeed;
+		HealthPoint = LaserHP;
+		Armor = LaserArmor;
+		Score = LaserScore;
+		damage = LaserDamage;
+		range = LaserRange;
+		father = Enemy;
+		eTexture.loadFromFile("resources/image/laser.png");
 		eSprite.setTexture(eTexture);
 		break;
 	default:

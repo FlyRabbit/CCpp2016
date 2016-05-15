@@ -22,6 +22,7 @@
 #include <time.h>
 #include <iostream>
 #include <string>
+#include <math.h>
 
 
 //typedef std::list<>
@@ -31,8 +32,12 @@
 #define Player 1
 #define Bullet 2
 #define JbBullet 3
-#define Boom 4
+#define Bomb 4
 #define Boss 5
+#define ExplodeWave 6
+#define ParachuteBomb 7
+#define ParachuteBullet 8
+#define Laser 9
 #define ExtraRate 1.5
 #define Alive 1
 #define Destroy1 99999985
@@ -79,6 +84,21 @@
 #define JbBulletDamage 100
 #define JbBulletRange 0
 
+//bomb
+#define BombSpeed 500.f
+#define BombHP 99999999
+#define BombScore 0
+#define BombArmor 0
+#define BombDamage 0
+#define BombRange 0
+
+//explosive wave
+#define ExplodeWaveSpeed 700.f
+#define ExplodeWaveHP 99999999
+#define ExplodeWaveScore 0
+#define ExplodeWaveArmor 0
+#define ExplodeWaveDamage 7000
+#define ExplodeWaveRange 0
 
 //boss
 #define BossSpeed 10.f
@@ -88,31 +108,55 @@
 #define BossDamage 1000;
 #define BossRange 0
 
+//parachute bomb
+#define ParachuteBombSpeed 100.f
+#define ParachuteBombHP 1
+#define ParachuteBombScore 0
+#define ParachuteBombArmor 0
+#define ParachuteBombDamage 0
+#define ParachuteBombRange 0
+
+//parachute bullet
+#define ParachuteBulletSpeed 100.f
+#define ParachuteBulletHP 1
+#define ParachuteBulletScore 0
+#define ParachuteBulletArmor 0
+#define ParachuteBulletDamage 0
+#define ParachuteBulletRange 0
+
+//laser
+#define LaserSpeed 800.f
+#define LaserHP 1
+#define LaserScore 0
+#define LaserArmor 0
+#define LaserDamage 22
+#define LaserRange 0
+
+
 //limit boundary
 #define BoundaryHigh 800
 #define BoundaryWidth 480
-#define JbBulletWidth 4
-#define JbBulletHight 8
-#define BulletWidth 4
-#define BulletHight 8
-#define EnemyWidth 16
-#define EnemyHeight 20
-#define BossWidth 40
-#define BossHeight 57
 #define BulletPositionX 190.f
 #define BulletPositionY 765.f
 #define JbBulletPositionX 240.f
 #define JbBulletPositionY 765.f
+#define BombPositionX 290.f
+#define BombPositionY 765.f
 
-//timr
+//time
 #define Level1Time 490
 #define Level2Time 440
 #define Level3Time 390
 
 
 //other
+#define GetBombs 1
 #define PFITERATOR std::_List_iterator<std::_List_val<std::_List_simple_types<Aircraft>>>
 #define NoFather 9999
 #define MAXNUM 999999999
 #define InitialJbBullet 400
+#define InitialBomb 10
 #define BackGroundSpeed 50.f
+#define M_PI 3.14159265358979323846
+#define UnderAttack true
+#define Safe false
