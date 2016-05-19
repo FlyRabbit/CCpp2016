@@ -38,6 +38,8 @@
 #define ParachuteBomb 7
 #define ParachuteBullet 8
 #define Laser 9
+#define ParachuteCure 10
+#define Parachute 11
 #define ExtraRate 1.5
 #define Alive 1
 #define Destroy1 99999985
@@ -101,7 +103,7 @@
 #define ExplodeWaveRange 0
 
 //boss
-#define BossSpeed 10.f
+#define BossSpeed 20.f
 #define BossHP 5000
 #define BossScore 1000
 #define BossArmor 8
@@ -123,6 +125,14 @@
 #define ParachuteBulletArmor 0
 #define ParachuteBulletDamage 0
 #define ParachuteBulletRange 0
+
+//parachute bullet
+#define ParachuteCureSpeed 100.f
+#define ParachuteCureHP 1
+#define ParachuteCureScore 0
+#define ParachuteCureArmor 0
+#define ParachuteCureDamage 0
+#define ParachuteCureRange 0
 
 //laser
 #define LaserSpeed 800.f
@@ -160,3 +170,4 @@
 #define M_PI 3.14159265358979323846
 #define UnderAttack true
 #define Safe false
+#define offset 25

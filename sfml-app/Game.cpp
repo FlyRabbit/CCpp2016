@@ -31,6 +31,7 @@ Game::Game()
 ,parachuteBomb(ParachuteBomb)
 ,parachuteBullet(ParachuteBullet)
 ,laser(Laser)
+,parachuteCure(ParachuteCure)
 ,font()
 ,music()
 ,enemyNum(0)
@@ -68,7 +69,7 @@ Game::Game()
 	jbBulletAmmo.setString(jbnum);
 	jbBulletAmmo.setColor(sf::Color::Black);
 	jbBulletAmmo.setCharacterSize(20);
-	jbBulletAmmo.setPosition(JbBulletPositionX+8, JbBulletPositionY+8);
+	jbBulletAmmo.setPosition(JbBulletPositionX+8, JbBulletPositionY+8-offset);
 	jbBulletAmmo.setStyle(sf::Text::Italic);
 
 	//bomb ammo
@@ -77,7 +78,7 @@ Game::Game()
 	bombAmmo.setString(jbnum);
 	bombAmmo.setColor(sf::Color::Black);
 	bombAmmo.setCharacterSize(20);
-	bombAmmo.setPosition(BombPositionX + 8, BombPositionY + 8);
+	bombAmmo.setPosition(BombPositionX + 8, BombPositionY + 8- offset);
 	bombAmmo.setStyle(sf::Text::Italic);
 
 	//Bomb explode
@@ -110,6 +111,12 @@ Game::Game()
 	if (!enemyDestroySound.openFromFile("resources/sound/enemy1_down.ogg"))
 	{
 		printf("Opne bullet sound failed!\n");
+	}
+
+	//cure sound
+	if (!cure.openFromFile("resources/sound/cure.ogg"))
+	{
+		printf("Open cure sound failed!\n");
 	}
 
 	//destroy enemies
@@ -266,7 +273,7 @@ Game::Game()
 		printf("Load bomb pic failed!\n");
 	}
 	sBomb.setTexture(tBomb);
-	sBomb.setPosition(BombPositionX, BombPositionY);
+	sBomb.setPosition(BombPositionX, BombPositionY- offset);
 
 	//bomb target
 	/*if (!tBombTarget.loadFromFile("resources/image/bombtarget.png"))
@@ -282,7 +289,7 @@ Game::Game()
 		printf("load bullet pic failed!\n");
 	}
 	sBullet.setTexture(tBullet);
-	sBullet.setPosition(BulletPositionX, BulletPositionY);
+	sBullet.setPosition(BulletPositionX, BulletPositionY- offset);
 
 
 	//frame
@@ -291,7 +298,7 @@ Game::Game()
 		printf("load frame pic failed!\n");
 	}
 	sFrame.setTexture(tFrame);
-	sFrame.setPosition(BulletPositionX -4, BulletPositionY -8);
+	sFrame.setPosition(BulletPositionX -4, BulletPositionY -8- offset);
 
 
 	//game over pic
@@ -302,13 +309,20 @@ Game::Game()
 	gameOver.setTexture(tGameOver);
 	gameOver.setPosition(0, 0);
 
+	if (!tHealthPoint.loadFromFile("resources/image/HP100%.png"))
+	{
+		printf("load 100% pic failed!\n");
+	}
+	sHealthPoint.setTexture(tHealthPoint);
+	sHealthPoint.setPosition(0, BoundaryHigh- offset);
+
 	//Jb Bullet
 	if (!tJbBullet.loadFromFile("resources/image/jbbulletselect.png"))
 	{
 		printf("load Jb bullet pic failed!\n");
 	}
 	sJbBullet.setTexture(tJbBullet);
-	sJbBullet.setPosition(JbBulletPositionX, JbBulletPositionY);
+	sJbBullet.setPosition(JbBulletPositionX, JbBulletPositionY- offset);
 
 
 	mPlayer.eSprite.setPosition(240.f, 700.f);
@@ -331,18 +345,18 @@ void Game::changeBullet(int flag)
 	case Bullet:
 		bombType = Bullet;
 		bullet=&commonBullet;
-		sFrame.setPosition(BulletPositionX-4,BulletPositionY-8);
+		sFrame.setPosition(BulletPositionX-4,BulletPositionY-8- offset);
 		break;
 	case JbBullet:
 		bombType = JbBullet;
 		bullet = &jbBullet;
-		sFrame.setPosition(JbBulletPositionX - 4, JbBulletPositionY - 8);
+		sFrame.setPosition(JbBulletPositionX - 4, JbBulletPositionY - 8- offset);
 		break;
 	case Bomb:
 		bombType = Bomb;
 		bullet = &bomb;
-		sFrame.setPosition(BombPositionX - 4, BombPositionY - 8);
-		bomb.eSprite.setPosition(BombPositionX, BombPositionY - 40);
+		sFrame.setPosition(BombPositionX - 4, BombPositionY - 8- offset);
+		bomb.eSprite.setPosition(BombPositionX, BombPositionY - 40- offset);
 		break;
 	default:
 		break;
@@ -353,16 +367,16 @@ void Game::changeBullet(int flag)
 void Game::checkCollision(PFITERATOR iterator1, PFITERATOR iterator2)
 {
 	if ((*iterator1).type == (*iterator2).father || (*iterator2).type == (*iterator1).father || ((*iterator1).father!=Player && (*iterator2).father!=Player) || 
-		((iterator1->type==ParachuteBomb || iterator1->type == ParachuteBullet) && iterator2->type!=Player)) return;
+		((iterator1->father == Parachute) && iterator2->type!=Player)) return;
 	int dam = (*iterator2).damage - (*iterator1).Armor*ArmorRate;
 	if (dam < 0) dam = 0;
 	(*iterator1).HealthPoint -= dam;
 
 	if ((*iterator1).type == Player)
 	{
-		printf("%d %d\n", (*iterator1).HealthPoint, dam);
+		//printf("%d %d\n", (*iterator1).HealthPoint, dam);
 		//mPlayer.HealthPoint = iterator1->HealthPoint;
-		if (iterator2->type != ParachuteBomb && iterator2->type != ParachuteBullet)
+		if (iterator2->father != Parachute)
 			playerAttackSound.play();
 		if (iterator2->damage != 0)
 		{
@@ -393,7 +407,7 @@ void Game::checkCollision(PFITERATOR iterator1, PFITERATOR iterator2)
 			sumScore += (*iterator1).Score;
 			break;
 		case Player:
-			CreateThread(NULL, 0, ThreadProc, (PVOID)&sumScore, 0, NULL);
+			//CreateThread(NULL, 0, ThreadProc, (PVOID)&sumScore, 0, NULL);
 			mPlayer.eTexture.loadFromFile("resources/image/playerdestroy1.png");
 			mPlayer.eSprite.setTexture((*iterator1).eTexture);
 			//gameOverSound.play();
@@ -417,6 +431,13 @@ void Game::checkCollision(PFITERATOR iterator1, PFITERATOR iterator2)
 			getJbBullet.play();
 			(*iterator1).flag = Destroy4;
 			jbBullet.ammo+=100;
+			break;
+		case ParachuteCure:
+			cure.play();
+			iterator1->flag = Destroy4;
+			iterator2->HealthPoint += 300;
+			if (iterator2->HealthPoint > 1000)
+				iterator2->HealthPoint = 1000;
 			break;
 		default:
 			break;
@@ -596,6 +617,58 @@ void Game::layout()
 	mWindow.draw(sJbBullet);
 	mWindow.draw(sBomb);
 	mWindow.draw(sFrame);
+	mWindow.draw(sHealthPoint);
+
+	if (mPlayer.HealthPoint == 1000)
+	{
+		tHealthPoint.loadFromFile("resources/image/HP100%.png");
+		sHealthPoint.setTexture(tHealthPoint);
+	}
+	else if (mPlayer.HealthPoint >= 900)
+	{
+		tHealthPoint.loadFromFile("resources/image/HP90%.png");
+		sHealthPoint.setTexture(tHealthPoint);
+	}
+	else if (mPlayer.HealthPoint >= 800)
+	{
+		tHealthPoint.loadFromFile("resources/image/HP80%.png");
+		sHealthPoint.setTexture(tHealthPoint);
+	}
+	else if (mPlayer.HealthPoint >= 700)
+	{
+		tHealthPoint.loadFromFile("resources/image/HP70%.png");
+		sHealthPoint.setTexture(tHealthPoint);
+	}
+	else if (mPlayer.HealthPoint >= 600)
+	{
+		tHealthPoint.loadFromFile("resources/image/HP60%.png");
+		sHealthPoint.setTexture(tHealthPoint);
+	}
+	else if (mPlayer.HealthPoint >= 500)
+	{
+		tHealthPoint.loadFromFile("resources/image/HP50%.png");
+		sHealthPoint.setTexture(tHealthPoint);
+	}
+	else if (mPlayer.HealthPoint >= 400)
+	{
+		tHealthPoint.loadFromFile("resources/image/HP40%.png");
+		sHealthPoint.setTexture(tHealthPoint);
+	}
+	else if (mPlayer.HealthPoint >= 300)
+	{
+		tHealthPoint.loadFromFile("resources/image/HP30%.png");
+		sHealthPoint.setTexture(tHealthPoint);
+	}
+	else if (mPlayer.HealthPoint >= 200)
+	{
+		tHealthPoint.loadFromFile("resources/image/HP20%.png");
+		sHealthPoint.setTexture(tHealthPoint);
+	}
+	else
+	{
+		tHealthPoint.loadFromFile("resources/image/HP10%.png");
+		sHealthPoint.setTexture(tHealthPoint);
+	}
 		
 	if (bullet->type == JbBullet)
 	{
@@ -628,7 +701,6 @@ void Game::layout()
 		
 	}
 	//printf("%d %d %d\n", mPlayer.underAttack, lastHP, mPlayer.HealthPoint);
-	lastHP = mPlayer.HealthPoint;
 }
 
 
@@ -688,6 +760,7 @@ void Game::listup()
 		if (i->type == Player)
 		{
 			i->eSprite.setPosition(mPlayer.eSprite.getPosition().x, mPlayer.eSprite.getPosition().y);
+			mPlayer.HealthPoint = i->HealthPoint;
 			//*i = mPlayer;
 			//i->underAttack = mPlayer.underAttack;
 		}
@@ -714,6 +787,13 @@ void Game::parachuteup()
 		parachuteBullet.flag = Alive;
 		events.push_back(parachuteBullet);
 		parachuteBulletScore = sumScore;
+	}
+	if (sumScore - parachuteCureScore >= 7000)
+	{
+		parachuteCure.eSprite.setPosition(xPostion, -50);
+		parachuteCure.flag = Alive;
+		events.push_back(parachuteCure);
+		parachuteCureScore = sumScore;
 	}
 }
 

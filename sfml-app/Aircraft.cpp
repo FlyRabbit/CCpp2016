@@ -102,7 +102,7 @@ eTexture()
 		Score = ParachuteBombScore;
 		damage = ParachuteBombDamage;
 		range = ParachuteBombRange;
-		father = Enemy;
+		father = Parachute;
 		eTexture.loadFromFile("resources/image/parachutebomb.png");
 		eSprite.setTexture(eTexture);
 		break;
@@ -114,7 +114,7 @@ eTexture()
 		Score = ParachuteBulletScore;
 		damage = ParachuteBulletDamage;
 		range = ParachuteBulletRange;
-		father = Enemy;
+		father = Parachute;
 		eTexture.loadFromFile("resources/image/parachutejbbullet.png");
 		eSprite.setTexture(eTexture);
 		break;
@@ -130,6 +130,17 @@ eTexture()
 		eTexture.loadFromFile("resources/image/laser.png");
 		eSprite.setTexture(eTexture);
 		break;
+	case ParachuteCure:
+		type = flag;
+		eVelocity = ParachuteCureSpeed;
+		HealthPoint = ParachuteCureHP;
+		Armor = ParachuteCureArmor;
+		Score = ParachuteCureScore;
+		damage = ParachuteCureDamage;
+		range = ParachuteCureRange;
+		father = Parachute;
+		eTexture.loadFromFile("resources/image/cure.png");
+		eSprite.setTexture(eTexture);
 	default:
 		break;
 	}
