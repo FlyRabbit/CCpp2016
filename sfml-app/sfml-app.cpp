@@ -13,7 +13,11 @@ int main()
 	//Socket socket;
 	//socket.getRank(500);
 	//system("pause");
-	Game game;
-	game.run();
+	while (1)
+	{
+		Game game;
+		game.run();
+		//delete game;
+	}
 }
 

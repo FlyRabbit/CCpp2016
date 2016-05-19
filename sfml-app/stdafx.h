@@ -25,6 +25,13 @@
 #include <math.h>
 
 
+typedef 
+struct button
+{
+	int positionX, positionY;
+	int currentNum;
+}BUTTON;
+
 //typedef std::list<>
 
 
@@ -171,3 +178,7 @@
 #define UnderAttack true
 #define Safe false
 #define offset 25
+#define NewGameButtonX 95
+#define NewGameButtonY 320
+#define ExitButtonX 95
+#define ExitButtonY 490

@@ -29,28 +29,28 @@ private:
 
 
 private:
-	bool mIsMovingUp, mIsMovingDown, mIsMovingLeft, mIsMovingRight, mFire, mBullet, mJbBullet, mBomb, mUp, mDown, mLeft, mRight, bombstop;
+	bool mIsMovingUp, mIsMovingDown, mIsMovingLeft, mIsMovingRight, mFire, mBullet, mJbBullet, mBomb, mUp, mDown, mLeft, mRight, mReturn, mEsc, bombstop, if_menu, if_pause;
 	int bombType, bossPositionX[100];
 	int enemyNum, bossNum, sumScore, gameOverFlag, count, parachuteBombScore, parachuteBulletScore, parachuteCureScore, lastHP;
 
 private:
 	void fire(Aircraft mPlayer);
-	
+	BUTTON buttonList[3],currentButton;
 	std::list<Aircraft> events,backup;
 	std::list<PFITERATOR> destroy;
-	std::string scoreString;
+	std::wstring scoreString;
 	Aircraft mPlayer, *bullet, enemy, commonBullet, jbBullet, boss, bomb, explodeWave, parachuteBomb,parachuteBullet, parachuteCure, laser;
 
 private:
 	sf::Time globalTime, fireTime;
-	sf::Sprite backGround1, backGround2, gameOver, sBullet, sJbBullet, sFrame, sBomb, sBombTarget, sHealthPoint;
+	sf::Sprite backGround1, backGround2, gameOver, sBullet, sJbBullet, sFrame, sBomb, sBombTarget, sHealthPoint, sMenu, sNewGameButton, sExitButton, sArrow, sPause, sBackToMenu;
 	sf::Sprite sAttackSideLeft[13];
-	sf::Texture tBackGround, tGameOver, tBullet, tJbBullet, tFrame, tBomb, tBombTarget, tHealthPoint;
+	sf::Texture tBackGround, tGameOver, tBullet, tJbBullet, tFrame, tBomb, tBombTarget, tHealthPoint, tMenu, tNewGameButton, tExitButton, tArrow, tPause, tBackToMenu;
 	sf::Texture tAttackSideLeft[13];
 	sf::Clock fireClock;
 	sf::RenderWindow mWindow;
 	sf::Font font;
 	sf::Text text, jbBulletAmmo, bombAmmo;
-	sf::Music music, bulletSound, playerAttackSound, enemyDestroySound, gameOverSound, bossSound, bossDestroy, bombExplode, getBomb, getJbBullet, laserSound, cure;
+	sf::Music music, bulletSound, playerAttackSound, enemyDestroySound, gameOverSound, bossSound, bossDestroy, bombExplode, getBomb, getJbBullet, laserSound, cure, menuSound, buttonSound;
 };
 

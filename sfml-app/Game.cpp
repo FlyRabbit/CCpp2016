@@ -14,10 +14,12 @@ DWORD WINAPI ThreadProc(
 	return 0;
 }
 
+
 int compareTime()
 {
 	return (AttackEndTime.wHour * 3600000 + AttackEndTime.wSecond * 1000 + AttackEndTime.wMilliseconds) - (AttackEndTime.wHour * 3600000 + AttackStartTime.wSecond * 1000 + AttackStartTime.wMilliseconds);
 }
+
 
 Game::Game()
 :mWindow(sf::VideoMode(BoundaryWidth,BoundaryHigh),"Flight")
@@ -51,9 +53,22 @@ Game::Game()
 	mBullet = false;
 	mJbBullet = false;
 	mBomb = false;
+	mReturn = false;
+	mEsc = false;
 	bombstop = false;
+	if_menu = true;
+	if_pause = false;
 	bombType = Bullet;
 	bullet = &commonBullet;
+
+	buttonList[1].currentNum = 1;
+	buttonList[1].positionX = NewGameButtonX - 30;
+	buttonList[1].positionY = NewGameButtonY + 35;
+	buttonList[2].currentNum = 2;
+	buttonList[2].positionX = ExitButtonX - 30;
+	buttonList[2].positionY = ExitButtonY + 35;
+	currentButton = buttonList[1];
+
 	
 
 	//font
@@ -107,6 +122,13 @@ Game::Game()
 	}
 	bulletSound.setVolume(40);
 
+	//buttonsound
+	if (!buttonSound.openFromFile("resources/sound/button.ogg"))
+	{
+		printf("Open button sound failed!\n");
+	}
+	buttonSound.setVolume(200);
+
 	//attack enemies
 	if (!enemyDestroySound.openFromFile("resources/sound/enemy1_down.ogg"))
 	{
@@ -157,9 +179,17 @@ Game::Game()
 	//laser sound
 	if (!laserSound.openFromFile("resources/sound/camera_click.ogg"))
 	{
-		printf("Open laser soound failed!\n");
+		printf("Open laser sound failed!\n");
 	}
 	//laserSound.setVolume(30);
+
+
+	//menu sound
+	if (!menuSound.openFromFile("resources/sound/menu.ogg"))
+	{
+		printf("Open menu sound failed!\n");
+	}
+	menuSound.play();
 
 	//Music
 	if (!music.openFromFile("resources/sound/game_music.ogg"))
@@ -167,8 +197,16 @@ Game::Game()
 		printf("Opne music failed!\n");
 	}
 	music.setLoop(true);
-	music.play();
 	music.setVolume(37);
+
+
+	// arrow
+	if (!tArrow.loadFromFile("resources/image/arrow.png"))
+	{
+		printf("load arrow failed!\n");
+	}
+	sArrow.setTexture(tArrow);
+	sArrow.setPosition(buttonList[1].positionX,buttonList[1].positionY);
 
 
 	//attack side left
@@ -325,12 +363,49 @@ Game::Game()
 	sJbBullet.setPosition(JbBulletPositionX, JbBulletPositionY- offset);
 
 
+	//Menu
+	if (!tMenu.loadFromFile("resources/image/Menu.png"))
+	{
+		printf("Load Menu pic failed!\n");
+	}
+	sMenu.setTexture(tMenu);
+	sMenu.setPosition(0, 0);
+
+	//newgame button
+	if (!tNewGameButton.loadFromFile("resources/image/newgame.png"))
+	{
+		printf("Load new game pic failed!\n");
+	}
+	sNewGameButton.setTexture(tNewGameButton);
+	sNewGameButton.setPosition(NewGameButtonX, NewGameButtonY);
+
+	//exit button
+	if (!tExitButton.loadFromFile("resources/image/exit.png"))
+	{
+		printf("Load exit pic failed!\n");
+	}
+	sExitButton.setTexture(tExitButton);
+	sExitButton.setPosition(ExitButtonX, ExitButtonY);
+
+	//pause
+	if (!tPause.loadFromFile("resources/image/pause.png"))
+	{
+		printf("Load pause pic failed!\n");
+	}
+	sPause.setTexture(tPause);
+	sPause.setPosition(0, 0);
+
+	//back to menu
+	if (!tBackToMenu.loadFromFile("resources/image/backtomenu.png"))
+	{
+		printf("Load backtomenu pic failed!\n");
+	}
+	sBackToMenu.setTexture(tBackToMenu);
+	sBackToMenu.setPosition(0, 0);
+
 	mPlayer.eSprite.setPosition(240.f, 700.f);
 	
-	GetLocalTime(&FireStartTime);
-	EnemyStartTime = FireStartTime;
-	BossStartTime = FireStartTime;
-	EnemyFireStartTIme = FireStartTime;
+	
 	events.push_back(mPlayer);
 
 	//srand
@@ -595,6 +670,16 @@ void Game::handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
 		mLeft = isPressed;
 	else if (key == sf::Keyboard::Right)
 		mRight = isPressed;
+	else if (key == sf::Keyboard::Return)
+		mReturn = isPressed;
+	else if (key == sf::Keyboard::Escape)
+	{
+		printf("%d %d\n", if_pause, isPressed);
+		if (isPressed && if_pause) if_pause = false;
+		else if (if_pause == false && isPressed) if_pause = true;
+		
+		mEsc = isPressed;
+	}
 
 }
 
@@ -768,6 +853,50 @@ void Game::listup()
 		
 	}
 	
+}
+
+
+void Game::menu()
+{
+	mWindow.clear();
+	mWindow.draw(sMenu);
+	mWindow.draw(sNewGameButton);
+	mWindow.draw(sExitButton);
+	mWindow.draw(sArrow);
+	processEvents();
+	if (mUp && currentButton.currentNum == 2)
+	{
+		sArrow.setPosition(buttonList[1].positionX, buttonList[1].positionY);
+		buttonSound.play();
+		printf("up\n");
+		currentButton = buttonList[1];
+	}
+	if (mDown && currentButton.currentNum == 1)
+	{
+		sArrow.setPosition(buttonList[2].positionX, buttonList[2].positionY);
+		printf("down\n");
+		buttonSound.play();
+		currentButton = buttonList[2];
+	}
+	mWindow.display();
+	if (mReturn)
+		switch (currentButton.currentNum)
+		{
+		case 1:
+			if_menu = false;
+			menuSound.pause();
+			music.play();
+			GetLocalTime(&FireStartTime);
+			EnemyStartTime = FireStartTime;
+			BossStartTime = FireStartTime;
+			EnemyFireStartTIme = FireStartTime;
+			break;
+		case 2:
+			exit(0);
+			break;
+		default:
+			break;
+		}
 }
 
 
@@ -951,12 +1080,15 @@ void Game::render()
 			Aircraft pic = *i;
 			mWindow.draw(pic.eSprite);
 		}
+		if (if_pause) mWindow.draw(sPause);
 	}
 	else
 	{
 		entityDestroy();
 		mWindow.draw(gameOver);
-		showScore(100,400);
+		//mWindow.draw(sBackToMenu);
+		//if (mReturn) return;
+		showScore(50,400);
 		text.setCharacterSize(80);
 		mWindow.draw(text);
 	}
@@ -969,27 +1101,34 @@ void Game::run()
 	sf::Clock clock,globalClock;
 	while (mWindow.isOpen())
 	{
-		globalTime = globalClock.restart();
-		fireTime = fireClock.restart();
-		sf::Time deltaTime = clock.restart();
+		if (if_menu) menu();
+		else
+		{
+			globalTime = globalClock.restart();
+			fireTime = fireClock.restart();
+			sf::Time deltaTime = clock.restart();
 
-		processEvents();
-		if (gameOverFlag==Alive)
-			update(deltaTime);
-		enemyup();	
-		parachuteup();
-		enemyshoot();
-		listup();
-		render();
+				processEvents();
+			if (if_pause == false)
+			{
+				if (gameOverFlag == Alive)
+					update(deltaTime);
+				enemyup();
+				parachuteup();
+				enemyshoot();
+				listup();
+			}
+			render();
+		}
 	}
 }
 
 
 void Game::showScore(float x,float y)
 {
-	scoreString = "Score: ";
+	scoreString = L"分数: ";
 	if (count < sumScore) count+=2;
-	std::string score = std::to_string(count);
+	std::wstring score = std::to_wstring(count);
 	scoreString.append(score);
 	text.setPosition(x, y);
 	text.setString(scoreString);
