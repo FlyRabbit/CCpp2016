@@ -34,6 +34,7 @@ Game::Game()
 ,parachuteBullet(ParachuteBullet)
 ,laser(Laser)
 ,parachuteCure(ParachuteCure)
+,caiDan(CaiDan)
 ,font()
 ,music()
 ,enemyNum(0)
@@ -43,6 +44,8 @@ Game::Game()
 ,parachuteBombScore(0)
 , parachuteBulletScore(0)
 ,lastHP(PlayerHP)
+,limitBoss(MaxNumOfBoss)
+,limitEnemy(MaxNumOfenemy)
 ,gameOverFlag(Alive)
 {
 	mIsMovingDown = false;
@@ -56,8 +59,11 @@ Game::Game()
 	mReturn = false;
 	mEsc = false;
 	bombstop = false;
+	upstop = false;
+	downstop = false;
 	if_menu = true;
 	if_pause = false;
+	if_caiDan = false;
 	bombType = Bullet;
 	bullet = &commonBullet;
 
@@ -65,8 +71,11 @@ Game::Game()
 	buttonList[1].positionX = NewGameButtonX - 30;
 	buttonList[1].positionY = NewGameButtonY + 35;
 	buttonList[2].currentNum = 2;
-	buttonList[2].positionX = ExitButtonX - 30;
-	buttonList[2].positionY = ExitButtonY + 35;
+	buttonList[2].positionX = HelpButtonX - 30;
+	buttonList[2].positionY = HelpButtonY + 35;
+	buttonList[3].currentNum = 3;
+	buttonList[3].positionX = ExitButtonX - 30;
+	buttonList[3].positionY = ExitButtonY + 35;
 	currentButton = buttonList[1];
 
 	
@@ -129,6 +138,12 @@ Game::Game()
 	}
 	buttonSound.setVolume(200);
 
+	//cai dan
+	if (!caidanSound.openFromFile("resources/sound/caidan.ogg"))
+	{
+		printf("Open caidan sound failed!\n");
+	}
+
 	//attack enemies
 	if (!enemyDestroySound.openFromFile("resources/sound/enemy1_down.ogg"))
 	{
@@ -190,6 +205,7 @@ Game::Game()
 		printf("Open menu sound failed!\n");
 	}
 	menuSound.play();
+	menuSound.setLoop(true);
 
 	//Music
 	if (!music.openFromFile("resources/sound/game_music.ogg"))
@@ -197,7 +213,7 @@ Game::Game()
 		printf("Opne music failed!\n");
 	}
 	music.setLoop(true);
-	music.setVolume(37);
+	music.setVolume(45);
 
 
 	// arrow
@@ -353,6 +369,21 @@ Game::Game()
 	}
 	sHealthPoint.setTexture(tHealthPoint);
 	sHealthPoint.setPosition(0, BoundaryHigh- offset);
+
+
+	if (!tHelpButton.loadFromFile("resources/image/help.png"))
+	{
+		printf("load help pic failed!\n");
+	}
+	sHelpButton.setTexture(tHelpButton);
+	sHelpButton.setPosition(HelpButtonX, HelpButtonY);
+
+	if (!tHelp.loadFromFile("resources/image/intro.png"))
+	{
+		printf("load intro pic failed!\n");
+	}
+	sHelp.setTexture(tHelp);
+	sHelp.setPosition(0, 0);
 
 	//Jb Bullet
 	if (!tJbBullet.loadFromFile("resources/image/jbbulletselect.png"))
@@ -528,7 +559,7 @@ bool Game::checkOverstep(PFITERATOR iterator1)
 
 	int aircraftY = (int)iterator1->eSprite.getPosition().y;
 	int aircraftX = (int)iterator1->eSprite.getPosition().x;
-
+	if (if_caiDan) return false;
 	if (aircraftY > BoundaryHigh + 50 || aircraftY<-50 || aircraftX<-50 || aircraftX>BoundaryWidth+50)
 		return true;
 	return false;
@@ -553,7 +584,7 @@ void Game::enemyup()
 	float xPostion = (rand() % (BoundaryWidth - 100)) + 50;
 	GetLocalTime(&EnemyEndTime);
 	BossEndTime = EnemyEndTime;
-	if (abs(EnemyEndTime.wMilliseconds - EnemyStartTime.wMilliseconds) > Level3Time && enemyNum <=1000)
+	if (abs(EnemyEndTime.wMilliseconds - EnemyStartTime.wMilliseconds) > Level3Time && enemyNum <limitEnemy)
 	{
 		enemyNum++;
 		enemy.eSprite.setPosition(xPostion, -50);
@@ -563,7 +594,7 @@ void Game::enemyup()
 		GetLocalTime(&EnemyStartTime);
 	}
 
-	if (abs(BossEndTime.wSecond - BossStartTime.wSecond) > 20 && bossNum <= 100 && enemyNum>0)
+	if (abs(BossEndTime.wSecond - BossStartTime.wSecond) > 20 && bossNum < limitBoss && enemyNum>100)
 	{
 		bossNum++;
 		boss.eSprite.setPosition(xPostion, -50);
@@ -574,7 +605,19 @@ void Game::enemyup()
 		GetLocalTime(&BossStartTime);
 	}
 	
-
+	if (enemyNum == MaxNumOfenemy && bossNum == MaxNumOfBoss && if_caiDan==false)
+	{
+		caiDan.eSprite.setPosition(0, -BoundaryHigh-60);
+		caiDan.flag = Alive;
+		events.push_back(caiDan);
+		music.pause();
+		caidanSound.play();
+		caidanSound.setLoop(true);
+		if_caiDan = true;
+		jbBullet.ammo += 1000;
+		bomb.ammo += 15;
+		mPlayer.HealthPoint = 1000;
+	}
 }
 
 
@@ -663,9 +706,25 @@ void Game::handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
 	else if (key == sf::Keyboard::Num3)
 		mBomb = isPressed;
 	else if (key == sf::Keyboard::Up)
-		mUp = isPressed;
+	{
+		if (isPressed == true && upstop == false)
+			mUp = isPressed;
+		if (isPressed == false)
+		{
+			mUp = isPressed;
+			upstop = false;
+		}
+	}
 	else if (key == sf::Keyboard::Down)
-		mDown = isPressed;
+	{
+		if (isPressed==true && downstop==false)
+			mDown = isPressed;
+		if (isPressed == false)
+		{
+			mDown = isPressed;
+			downstop = false;
+		}
+	}
 	else if (key == sf::Keyboard::Left)
 		mLeft = isPressed;
 	else if (key == sf::Keyboard::Right)
@@ -674,7 +733,6 @@ void Game::handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
 		mReturn = isPressed;
 	else if (key == sf::Keyboard::Escape)
 	{
-		printf("%d %d\n", if_pause, isPressed);
 		if (isPressed && if_pause) if_pause = false;
 		else if (if_pause == false && isPressed) if_pause = true;
 		
@@ -687,15 +745,26 @@ void Game::handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
 void Game::layout()
 {
 	sf::Vector2f movement(0.f, BackGroundSpeed);
-	backGround1.move(movement * globalTime.asSeconds());
-	backGround2.move(movement * globalTime.asSeconds());
+	auto timeDifference = globalTime.asSeconds();
+	//printf("%f\n", timeDifference);
+	//system("pause");
+	backGround1.move(movement * timeDifference);
+	backGround2.move(movement * timeDifference);
 	mWindow.draw(backGround1);
 	mWindow.draw(backGround2);
+	
 	if (backGround1.getPosition().y >= BoundaryHigh)
+	{
 		backGround1.setPosition(0, 10 - BoundaryHigh);
+		//printf("1 : %f\n", backGround1.getPosition().y);
+	}
 	if (backGround2.getPosition().y >= BoundaryHigh)
+	{
 		backGround2.setPosition(0, 10 - BoundaryHigh);
-
+		//printf("2 : %d\n", backGround2.getPosition().y);
+	}
+	
+	
 	showScore(2.f,2.f);
 	mWindow.draw(text);
 	mWindow.draw(sBullet);
@@ -796,7 +865,8 @@ void Game::listup()
 	for (auto i = events.begin(); i != events.end();i++)
 	{
 		
-		
+		if (i->type == Player && i->HealthPoint != mPlayer.HealthPoint)
+			i->HealthPoint = mPlayer.HealthPoint;
 		if (checkOverstep(i))  //check whether overstep(bullets and enemies)
 			(*i).flag = Destroy4;
 		if ((*i).flag<Destroy1  )
@@ -833,6 +903,24 @@ void Game::listup()
 							
 						}
 					}
+
+					if (i->type == CaiDan && if_caiDan)
+					{
+						if (i->eSprite.getPosition().y >= 0)
+							i->eVelocity = 0;
+						if (mReturn)
+						{
+							i->eVelocity = CaiDanSpeed;
+							if_caiDan = false;
+							enemyNum++;
+							bossNum++;
+							limitBoss = 999999;
+							limitEnemy = 999999999;
+							caidanSound.pause();
+							music.play();
+
+						}
+					}
 				}
 				//else
 				//	(*i) = mPlayer;
@@ -858,27 +946,52 @@ void Game::listup()
 
 void Game::menu()
 {
+	
 	mWindow.clear();
 	mWindow.draw(sMenu);
 	mWindow.draw(sNewGameButton);
 	mWindow.draw(sExitButton);
+	mWindow.draw(sHelpButton);
 	mWindow.draw(sArrow);
 	processEvents();
-	if (mUp && currentButton.currentNum == 2)
+	if (mUp)
 	{
-		sArrow.setPosition(buttonList[1].positionX, buttonList[1].positionY);
-		buttonSound.play();
-		printf("up\n");
-		currentButton = buttonList[1];
+		//printf("2");
+		if (currentButton.currentNum == 2)
+		{
+			
+			sArrow.setPosition(buttonList[1].positionX, buttonList[1].positionY);
+			buttonSound.play();
+			currentButton = buttonList[1];
+			mUp = false;
+		}
+		else if (currentButton.currentNum == 3)
+		{
+			sArrow.setPosition(buttonList[2].positionX, buttonList[2].positionY);
+			buttonSound.play();
+			currentButton = buttonList[2];
+			mUp = false;
+		}
 	}
-	if (mDown && currentButton.currentNum == 1)
+
+	if (mDown)
 	{
-		sArrow.setPosition(buttonList[2].positionX, buttonList[2].positionY);
-		printf("down\n");
-		buttonSound.play();
-		currentButton = buttonList[2];
+		if (currentButton.currentNum == 1)
+		{
+			sArrow.setPosition(buttonList[2].positionX, buttonList[2].positionY);
+			buttonSound.play();
+			currentButton = buttonList[2];
+			mDown = false;
+		}
+		else if (currentButton.currentNum == 2)
+		{
+			sArrow.setPosition(buttonList[3].positionX, buttonList[3].positionY);
+			buttonSound.play();
+			currentButton = buttonList[3];
+			mDown = false;
+		}
 	}
-	mWindow.display();
+	
 	if (mReturn)
 		switch (currentButton.currentNum)
 		{
@@ -892,11 +1005,15 @@ void Game::menu()
 			EnemyFireStartTIme = FireStartTime;
 			break;
 		case 2:
+			mWindow.draw(sHelp);
+			break;
+		case 3:
 			exit(0);
 			break;
 		default:
 			break;
 		}
+	mWindow.display();
 }
 
 
@@ -1098,16 +1215,25 @@ void Game::render()
 
 void Game::run()
 {
-	sf::Clock clock,globalClock;
+	sf::Clock clock, globalClock;
 	while (mWindow.isOpen())
 	{
-		if (if_menu) menu();
+		//printf("%f %f\n", backGround1.getPosition().y, backGround2.getPosition().y);
+		if (if_menu)
+		{
+			menu();
+			if (if_menu == false)
+			{
+				globalTime = globalClock.restart();
+				sf::Time deltaTime = clock.restart();
+			}
+		}
 		else
 		{
 			globalTime = globalClock.restart();
 			fireTime = fireClock.restart();
 			sf::Time deltaTime = clock.restart();
-
+			//printf("%f\n", globalTime.asSeconds());
 				processEvents();
 			if (if_pause == false)
 			{

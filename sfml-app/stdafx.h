@@ -47,6 +47,7 @@ struct button
 #define Laser 9
 #define ParachuteCure 10
 #define Parachute 11
+#define CaiDan 12
 #define ExtraRate 1.5
 #define Alive 1
 #define Destroy1 99999985
@@ -149,6 +150,14 @@ struct button
 #define LaserDamage 22
 #define LaserRange 0
 
+//caidan
+#define CaiDanSpeed 150.f
+#define CaiDanHP 9999999
+#define CaiDanScore 0
+#define CaiDanArmor 0
+#define CaiDanDamage 10000
+#define CaiDanRange 0
+
 
 //limit boundary
 #define BoundaryHigh 800
@@ -172,7 +181,7 @@ struct button
 #define NoFather 9999
 #define MAXNUM 999999999
 #define InitialJbBullet 400
-#define InitialBomb 10
+#define InitialBomb 3
 #define BackGroundSpeed 50.f
 #define M_PI 3.14159265358979323846
 #define UnderAttack true
@@ -180,5 +189,9 @@ struct button
 #define offset 25
 #define NewGameButtonX 95
 #define NewGameButtonY 320
+#define HelpButtonX 95
+#define HelpButtonY 450
 #define ExitButtonX 95
-#define ExitButtonY 490
+#define ExitButtonY 580
+#define MaxNumOfenemy 1000
+#define MaxNumOfBoss 14

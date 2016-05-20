@@ -141,6 +141,19 @@ eTexture()
 		father = Parachute;
 		eTexture.loadFromFile("resources/image/cure.png");
 		eSprite.setTexture(eTexture);
+		break;
+	case CaiDan:
+		type = flag;
+		eVelocity = CaiDanSpeed;
+		HealthPoint = CaiDanHP;
+		Armor = CaiDanArmor;
+		Score = CaiDanScore;
+		damage = CaiDanDamage;
+		range = CaiDanRange;
+		father = Player;
+		eTexture.loadFromFile("resources/image/caidan.png");
+		eSprite.setTexture(eTexture);
+		break;
 	default:
 		break;
 	}

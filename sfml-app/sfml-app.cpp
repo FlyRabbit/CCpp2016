@@ -8,16 +8,7 @@
 
 int main()
 {
-	//initialize();
-	//system("python client.py");
-	//Socket socket;
-	//socket.getRank(500);
-	//system("pause");
-	while (1)
-	{
-		Game game;
-		game.run();
-		//delete game;
-	}
+	Game game;
+	game.run();
 }
 
